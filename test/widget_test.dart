@@ -1,30 +1,65 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:toktok/app.dart';
+import 'package:toktok/domain/entities/app_user.dart';
+import 'package:toktok/domain/services/auth_gateway.dart';
 
-import 'package:toktok/main.dart';
+import 'support/fakes.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
-
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('el login valida el formulario y mueve el foco con el teclado', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      TokTikApp(
+        authGateway: _FakeAuthGateway(),
+        repository: FakeVideoRepository(),
+      ),
+    );
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Ingresar'), findsOneWidget);
+    expect(find.bySemanticsLabel('Iniciar sesión'), findsOneWidget);
+
+    final fields = tester.widgetList<TextField>(find.byType(TextField)).toList();
+    expect(fields, hasLength(2));
+    expect(fields.first.focusNode, isNotNull);
+    expect(fields.first.textInputAction, TextInputAction.next);
+    expect(fields.last.textInputAction, TextInputAction.done);
+
+    await tester.enterText(find.byType(TextFormField).first, 'correo-mal');
+    await tester.enterText(find.byType(TextFormField).last, '123');
+    await tester.tap(find.text('Ingresar'));
+    await tester.pump();
+
+    expect(find.text('Ingresá un correo válido.'), findsOneWidget);
+    expect(
+      find.text('La contraseña debe tener al menos 6 caracteres.'),
+      findsOneWidget,
+    );
   });
+}
+
+class _FakeAuthGateway implements AuthGateway {
+  @override
+  AppUser? get currentUser => null;
+
+  @override
+  Stream<AppUser?> get onAuthStateChanged => Stream<AppUser?>.value(null);
+
+  @override
+  Future<AppUser> register({
+    required String name,
+    required String email,
+    required String password,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> signIn(
+      {required String email, required String password}) async {}
+
+  @override
+  Future<void> signOut() async {}
 }

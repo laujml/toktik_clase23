@@ -47,5 +47,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>TokTik necesita la cámara para grabar un video y subirlo.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>TokTik necesita el micrófono para grabar el audio del video.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>TokTik necesita acceder a tus videos para poder subirlos.</string>
 </dict>
 </plist>
