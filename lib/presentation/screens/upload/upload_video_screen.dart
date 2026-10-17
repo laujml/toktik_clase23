@@ -7,7 +7,16 @@ import 'package:toktok/presentation/providers/auth_provider.dart';
 import 'package:toktok/presentation/providers/upload_provider.dart';
 
 class UploadVideoScreen extends StatefulWidget {
-  const UploadVideoScreen({super.key});
+  const UploadVideoScreen({
+    super.key,
+    this.initialVideo,
+    this.videoLocked = false,
+  });
+
+  final XFile? initialVideo;
+
+  /// El archivo ya trae el filtro dibujado. No se puede reemplazar.
+  final bool videoLocked;
 
   @override
   State<UploadVideoScreen> createState() => _UploadVideoScreenState();
@@ -21,6 +30,12 @@ class _UploadVideoScreenState extends State<UploadVideoScreen> {
 
   XFile? _video;
   String? _fileError;
+
+  @override
+  void initState() {
+    super.initState();
+    _video = widget.initialVideo;
+  }
 
   @override
   void dispose() {
@@ -51,7 +66,11 @@ class _UploadVideoScreenState extends State<UploadVideoScreen> {
     final form = _formKey.currentState;
     final video = _video;
     if (video == null) {
-      setState(() => _fileError = 'Elegí un video de la galería o grabá uno.');
+      setState(() {
+        _fileError = widget.videoLocked
+            ? 'Falta el video con filtro. Volvé a grabar.'
+            : 'Elegí un video de la galería o grabá uno.';
+      });
     }
     if (form == null || !form.validate() || video == null) return;
 
@@ -84,7 +103,9 @@ class _UploadVideoScreenState extends State<UploadVideoScreen> {
     final percent = (upload.progress * 100).round();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Subir video')),
+      appBar: AppBar(
+        title: Text(widget.videoLocked ? 'Publicar con filtro' : 'Subir video'),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -100,9 +121,11 @@ class _UploadVideoScreenState extends State<UploadVideoScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      _video == null
-                          ? 'Todavía no elegiste un video.'
-                          : 'Video: ${_video!.name}',
+                      widget.videoLocked
+                          ? 'Este video incluye el filtro.'
+                          : _video == null
+                              ? 'Todavía no elegiste un video.'
+                              : 'Video: ${_video!.name}',
                     ),
                     if (_fileError != null) ...[
                       const SizedBox(height: 8),
@@ -113,35 +136,37 @@ class _UploadVideoScreenState extends State<UploadVideoScreen> {
                         ),
                       ),
                     ],
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        Semantics(
-                          button: true,
-                          label: 'Elegir video de la galería',
-                          child: OutlinedButton.icon(
-                            onPressed: upload.isUploading
-                                ? null
-                                : () => _pick(ImageSource.gallery),
-                            icon: const Icon(Icons.video_library_outlined),
-                            label: const Text('Galería'),
+                    if (!widget.videoLocked) ...[
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          Semantics(
+                            button: true,
+                            label: 'Elegir video de la galería',
+                            child: OutlinedButton.icon(
+                              onPressed: upload.isUploading
+                                  ? null
+                                  : () => _pick(ImageSource.gallery),
+                              icon: const Icon(Icons.video_library_outlined),
+                              label: const Text('Galería'),
+                            ),
                           ),
-                        ),
-                        Semantics(
-                          button: true,
-                          label: 'Grabar video con la cámara',
-                          child: OutlinedButton.icon(
-                            onPressed: upload.isUploading
-                                ? null
-                                : () => _pick(ImageSource.camera),
-                            icon: const Icon(Icons.videocam_outlined),
-                            label: const Text('Cámara'),
+                          Semantics(
+                            button: true,
+                            label: 'Grabar video con la cámara',
+                            child: OutlinedButton.icon(
+                              onPressed: upload.isUploading
+                                  ? null
+                                  : () => _pick(ImageSource.camera),
+                              icon: const Icon(Icons.videocam_outlined),
+                              label: const Text('Cámara'),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 20),
                     TextFormField(
                       controller: _captionController,

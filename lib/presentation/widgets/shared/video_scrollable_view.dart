@@ -10,11 +10,13 @@ class VideoScrollableView extends StatefulWidget {
     required this.videos,
     required this.onNearEnd,
     required this.isLoadingMore,
+    this.playbackEnabled = true,
   });
 
   final List<VideoPost> videos;
   final VoidCallback onNearEnd;
   final bool isLoadingMore;
+  final bool playbackEnabled;
 
   @override
   State<VideoScrollableView> createState() => _VideoScrollableViewState();
@@ -35,6 +37,13 @@ class _VideoScrollableViewState extends State<VideoScrollableView> {
     super.didUpdateWidget(oldWidget);
     final hadVideos = oldWidget.videos.isNotEmpty;
     final hasVideos = widget.videos.isNotEmpty;
+    if (widget.videos.isNotEmpty && _currentIndex >= widget.videos.length) {
+      _currentIndex = widget.videos.length - 1;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_pageController.hasClients) return;
+        _pageController.jumpToPage(_currentIndex);
+      });
+    }
     if (!hadVideos || !hasVideos) return;
     if (widget.videos.first.id == oldWidget.videos.first.id) return;
 
@@ -75,7 +84,7 @@ class _VideoScrollableViewState extends State<VideoScrollableView> {
                   caption: video.caption,
                   videoUrl: video.videoUrl,
                   authorName: video.authorName,
-                  isActive: index == _currentIndex,
+                  isActive: widget.playbackEnabled && index == _currentIndex,
                 ),
                 Positioned(
                   bottom: 40 + bottomInset,

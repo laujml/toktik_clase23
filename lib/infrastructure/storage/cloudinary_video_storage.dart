@@ -9,7 +9,14 @@ class CloudinaryVideoStorage implements VideoFileStorage {
     required this.cloudName,
     required this.uploadPreset,
     Dio? dio,
-  }) : _dio = dio ?? Dio();
+  }) : _dio = dio ??
+            Dio(
+              BaseOptions(
+                connectTimeout: const Duration(seconds: 20),
+                sendTimeout: const Duration(minutes: 2),
+                receiveTimeout: const Duration(seconds: 30),
+              ),
+            );
 
   final String cloudName;
   final String uploadPreset;
@@ -64,6 +71,11 @@ class CloudinaryVideoStorage implements VideoFileStorage {
         'No se pudo subir el video. Revisá tu conexión e intentá de nuevo.',
       );
     }
+  }
+
+  @override
+  Future<void> deleteStoredFile({required String videoUrl}) async {
+    // Un upload unsigned no se puede destruir desde la app sin el API Secret.
   }
 
   String _message(DioException error) {

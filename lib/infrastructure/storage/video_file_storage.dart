@@ -4,4 +4,6 @@ abstract class VideoFileStorage {
     required String uid,
     required void Function(double progress) onProgress,
   });
+
+  Future<void> deleteStoredFile({required String videoUrl});
 }

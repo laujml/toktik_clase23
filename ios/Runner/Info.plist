@@ -48,9 +48,9 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>TokTik necesita la cámara para grabar un video y subirlo.</string>
+	<string>TokTik usa la cámara frontal para los filtros en vivo y para grabar el video que se sube al feed.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>TokTik necesita el micrófono para grabar el audio del video.</string>
+	<string>TokTik usa el micrófono para guardar el audio del video con filtro.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>TokTik necesita acceder a tus videos para poder subirlos.</string>
 </dict>

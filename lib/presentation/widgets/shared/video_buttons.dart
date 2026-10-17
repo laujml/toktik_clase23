@@ -14,6 +14,8 @@ class VideoButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final likeLabel = video.isLiked ? 'Quitar me gusta' : 'Me gusta';
+    final uid = context.watch<AuthProvider>().uid;
+    final canDelete = !video.isLocal && video.uid.isNotEmpty && video.uid == uid;
 
     return Column(
       children: [
@@ -47,7 +49,55 @@ class VideoButtons extends StatelessWidget {
                 Icon(Icons.play_circle_outline, color: Colors.white, size: 30),
           ),
         ),
+        if (canDelete) ...[
+          const SizedBox(height: 20),
+          Semantics(
+            button: true,
+            label: 'Borrar video',
+            child: IconButton(
+              onPressed: () => _confirmDelete(context),
+              icon: const Icon(
+                Icons.delete_outline,
+                color: Colors.white,
+                size: 30,
+              ),
+            ),
+          ),
+        ],
       ],
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Borrar video'),
+          content: const Text(
+            'Se borra este video para todos. No se puede deshacer.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Borrar'),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final uid = context.read<AuthProvider>().uid;
+    final message =
+        await context.read<DiscoverProvider>().deleteVideo(video, uid);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message ?? 'Video borrado.')),
     );
   }
 

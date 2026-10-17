@@ -172,4 +172,39 @@ class FirestoreVideoDatasource implements VideoPostDatasource {
       );
     }
   }
+
+  @override
+  Future<void> deleteVideo({
+    required VideoPost video,
+    required String uid,
+  }) async {
+    if (video.isLocal || video.id.isEmpty || video.uid != uid) {
+      throw const VideoFeedException('Solo podés borrar tus propios videos.');
+    }
+
+    final videoRef = _firestore.collection('videos').doc(video.id);
+    try {
+      final snap = await videoRef.get();
+      if (!snap.exists) return;
+      if (snap.data()?['uid'] != uid) {
+        throw const VideoFeedException('Solo podés borrar tus propios videos.');
+      }
+
+      final ownLike = videoRef.collection('likes').doc(uid);
+      final ownLikeSnap = await ownLike.get();
+      if (ownLikeSnap.exists) {
+        await ownLike.delete();
+      }
+      await _storage.deleteStoredFile(videoUrl: video.videoUrl);
+      await videoRef.delete();
+    } on VideoFeedException {
+      rethrow;
+    } on FirebaseException catch (error) {
+      throw VideoFeedException(messageForFirebaseCode(error.code));
+    } catch (_) {
+      throw const VideoFeedException(
+        'No se pudo borrar el video. Revisá tu conexión e intentá de nuevo.',
+      );
+    }
+  }
 }

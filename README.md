@@ -104,6 +104,31 @@ flutter analyze
 flutter test
 ```
 
+## Filtros en un teléfono
+
+Los filtros no se pueden probar en Windows ni en el emulador de escritorio. Hace falta un **teléfono real** (Android o iPhone) con cámara frontal. El modelo de rostros de ML Kit viene en la app; no hay que descargarlo.
+
+Conectá el teléfono, activá la depuración USB y, desde `tiktok_clase23`:
+
+```powershell
+flutter pub get
+flutter devices
+flutter run --dart-define-from-file=dart_defines.json
+```
+
+En iPhone, la primera vez en una Mac: `cd ios` y `pod install`. El proyecto pide iOS 15.5.
+
+1. Entrá con una cuenta. Abajo hay dos secciones: **Feed** y **Filtros**.
+2. En **Filtros** el sistema pide cámara y micrófono. Si los negás, la pantalla lo dice. Si quedaron bloqueados, **Abrir ajustes** y activalos.
+3. La cámara frontal ocupa la sección. Abajo elegí **Ninguno**, **Kawaii** o **Lentes**. El seleccionado se anuncia para el lector de pantalla.
+4. **Kawaii:** una curita rosa con carita en la punta de la nariz, blush ovalado con tres rayitas blancas en cada mejilla y seis corazones que flotan alrededor de la cabeza. **Lentes:** dos corazones sobre los ojos, unidos por un puente. Si hay más de una cara, el filtro va en cada una. Al acercarte o inclinar la cabeza, el dibujo sigue el tamaño, el lugar y la inclinación.
+5. Si no detecta a nadie, dice "Mostrá tu cara en la cámara".
+6. Grabá con el botón redondo (hasta 15 segundos) y detené. El video que se guarda ya tiene el filtro dibujado; no es la cámara pelada.
+7. En **Publicar con filtro** poné una descripción y **Publicar**. Es el mismo flujo que la galería: Cloudinary (o Storage) y un documento en `videos` con uid, caption, likes, views y createdAt.
+8. La app vuelve al **Feed**. El video nuevo queda primero. Otra cuenta puede verlo, darle like, y entra en la paginación de 5 en 5.
+
+Qué mirar si algo no acompaña a la cara: la curita tiene que quedar en la nariz y el blush en las mejillas, tanto en la vista en vivo como en el video ya publicado. La luz de frente ayuda. Resolución media, y mientras un cuadro se analiza se saltean los que llegan atrás.
+
 ## Qué probar con dos cuentas
 
 Un emulador alcanza: cerrás sesión y entrás con la otra. Si querés verlas a la vez, abrí dos emuladores.
