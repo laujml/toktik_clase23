@@ -80,6 +80,23 @@ class DiscoverProvider extends ChangeNotifier {
     }
   }
 
+  Future<String?> deleteVideo(VideoPost video, String uid) async {
+    if (video.isLocal || video.uid != uid) {
+      return 'Solo podés borrar tus propios videos.';
+    }
+
+    try {
+      await _repository.deleteVideo(video: video, uid: uid);
+      videos = videos.where((item) => item.id != video.id).toList();
+      notifyListeners();
+      return null;
+    } on VideoFeedException catch (error) {
+      return error.message;
+    } catch (_) {
+      return 'No se pudo borrar el video. Revisá tu conexión e intentá de nuevo.';
+    }
+  }
+
   void insertUploaded(VideoPost video) {
     videos = [video, ...videos.where((item) => item.id != video.id)];
     notifyListeners();

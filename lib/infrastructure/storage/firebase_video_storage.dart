@@ -46,6 +46,22 @@ class FirebaseVideoStorage implements VideoFileStorage {
     }
   }
 
+  @override
+  Future<void> deleteStoredFile({required String videoUrl}) async {
+    if (!_isFirebaseUrl(videoUrl)) return;
+    try {
+      await _storage.refFromURL(videoUrl).delete();
+    } on FirebaseException catch (error) {
+      if (error.code == 'object-not-found') return;
+      throw VideoFeedException(_message(error));
+    }
+  }
+
+  bool _isFirebaseUrl(String videoUrl) {
+    return videoUrl.contains('firebasestorage.googleapis.com') ||
+        videoUrl.contains('firebasestorage.app');
+  }
+
   String _message(FirebaseException error) {
     switch (error.code) {
       case 'unauthorized':

@@ -3,13 +3,14 @@ import 'package:toktok/domain/repositories/video_post_repository.dart';
 
 VideoPost sampleVideo({
   String id = 'video-1',
+  String uid = 'author',
   int likes = 0,
   bool isLiked = false,
   bool isLocal = false,
 }) {
   return VideoPost(
     id: id,
-    uid: isLocal ? '' : 'author',
+    uid: isLocal ? '' : uid,
     authorName: isLocal ? 'TokTik' : 'Ana',
     caption: 'Un video',
     videoUrl: isLocal ? 'assets/videos/1.mp4' : 'https://example.com/video.mp4',
@@ -32,6 +33,7 @@ class FakeVideoRepository implements VideoPostRepository {
   bool hasMore = true;
   Duration delay = Duration.zero;
   VideoPost? toggled;
+  VideoPost? deleted;
 
   @override
   void reset() {
@@ -64,6 +66,14 @@ class FakeVideoRepository implements VideoPostRepository {
   }) async {
     toggled = video.copyWith(isLiked: !video.isLiked, likes: video.likes + 1);
     return toggled!;
+  }
+
+  @override
+  Future<void> deleteVideo({
+    required VideoPost video,
+    required String uid,
+  }) async {
+    deleted = video;
   }
 
   @override

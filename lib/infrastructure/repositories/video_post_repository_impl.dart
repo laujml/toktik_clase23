@@ -71,4 +71,12 @@ class VideoPostRepositoryImpl implements VideoPostRepository {
   }) {
     return _remoteDatasource.toggleLike(video: video, uid: uid);
   }
+
+  @override
+  Future<void> deleteVideo({
+    required VideoPost video,
+    required String uid,
+  }) {
+    return _remoteDatasource.deleteVideo(video: video, uid: uid);
+  }
 }

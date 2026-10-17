@@ -7,7 +7,9 @@ import 'package:toktok/presentation/screens/upload/upload_video_screen.dart';
 import 'package:toktok/presentation/widgets/shared/video_scrollable_view.dart';
 
 class DiscoverScreen extends StatefulWidget {
-  const DiscoverScreen({super.key});
+  const DiscoverScreen({super.key, this.playbackEnabled = true});
+
+  final bool playbackEnabled;
 
   @override
   State<DiscoverScreen> createState() => _DiscoverScreenState();
@@ -52,8 +54,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     final discover = context.watch<DiscoverProvider>();
     final authorName = context.watch<AuthProvider>().authorName;
 
-    return Scaffold(
-      body: Stack(
+    return ColoredBox(
+      color: Colors.black,
+      child: Stack(
+        fit: StackFit.expand,
         children: [
           if (discover.initialLoading)
             const Center(child: CircularProgressIndicator(strokeWidth: 2))
@@ -67,38 +71,45 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             VideoScrollableView(
               videos: discover.videos,
               isLoadingMore: discover.isLoading,
+              playbackEnabled: widget.playbackEnabled,
               onNearEnd: _load,
             ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      authorName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium,
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        authorName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                     ),
-                  ),
-                  Semantics(
-                    button: true,
-                    label: 'Subir video',
-                    child: IconButton(
-                      onPressed: _openUpload,
-                      icon: const Icon(Icons.add_box_outlined),
+                    Semantics(
+                      button: true,
+                      label: 'Subir video',
+                      child: IconButton(
+                        onPressed: _openUpload,
+                        icon: const Icon(Icons.add_box_outlined),
+                      ),
                     ),
-                  ),
-                  Semantics(
-                    button: true,
-                    label: 'Cerrar sesión',
-                    child: IconButton(
-                      onPressed: _logout,
-                      icon: const Icon(Icons.logout),
+                    Semantics(
+                      button: true,
+                      label: 'Cerrar sesión',
+                      child: IconButton(
+                        onPressed: _logout,
+                        icon: const Icon(Icons.logout),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

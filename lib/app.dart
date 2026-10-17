@@ -7,7 +7,7 @@ import 'package:toktok/presentation/providers/auth_provider.dart';
 import 'package:toktok/presentation/providers/discover_provider.dart';
 import 'package:toktok/presentation/providers/upload_provider.dart';
 import 'package:toktok/presentation/screens/auth/login_screen.dart';
-import 'package:toktok/presentation/screens/discover/discover_screen.dart';
+import 'package:toktok/presentation/screens/home/app_shell.dart';
 
 class TokTikApp extends StatelessWidget {
   const TokTikApp({
@@ -64,7 +64,7 @@ class _SessionGate extends StatelessWidget {
               body: Center(child: CircularProgressIndicator(strokeWidth: 2)),
             )
           : auth.isAuthenticated
-              ? const DiscoverScreen()
+              ? const AppShell()
               : const LoginScreen(),
     );
   }

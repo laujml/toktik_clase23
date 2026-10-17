@@ -82,6 +82,12 @@ class _PageDatasource implements VideoPostDatasource {
   }
 
   @override
+  Future<void> deleteVideo({
+    required VideoPost video,
+    required String uid,
+  }) async {}
+
+  @override
   Future<VideoPost> uploadVideo({
     required String filePath,
     required String caption,

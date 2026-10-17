@@ -22,4 +22,9 @@ abstract class VideoPostRepository {
     required VideoPost video,
     required String uid,
   });
+
+  Future<void> deleteVideo({
+    required VideoPost video,
+    required String uid,
+  });
 }
